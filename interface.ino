@@ -5,11 +5,15 @@ void Interface::begin () {
   server.on("/edit", HTTP_PUT, handleCreate);
   server.on("/edit", HTTP_POST, []() {returnOK();}, handleFileUpload);
   server.onNotFound(handleNotFound);
+  
   //RTC & Display & SD Init
   pinMode(D0, INPUT);
   pinMode(TOUCH_INT, INPUT_PULLUP);
   Wire.begin();
+  
   if(SD.begin(D2)){hasSD = true;}
+  WifiInit();
+  
   rtc.begin();
   rtc.getTime(&timeStruct);
   tft.init();
@@ -35,6 +39,7 @@ void Interface::tick () {
       watchFace();
     }
     if (state == 1){
+      if (state != laststate){}
       services();
     }
     laststate=state;
@@ -45,6 +50,12 @@ void Interface::tick () {
   }
   touchTick();
   if (serveren){server.handleClient();}
+  if (wifiTime < millis() && wifien){
+    if (WiFi.status() != WL_CONNECTED){
+      if(wifiMulti.run(7200)!=WL_CONNECTED){wifien=false;}
+    }
+    wifiTime = millis() + 30000;
+  }
 }
 
 void Interface::watchFace () {

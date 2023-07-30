@@ -2,8 +2,34 @@
 #include <SPI.h>
 #include <Wire.h>
 #include <SD.h>
+
 #include <esp_wifi.h>
 #include <WiFi.h>
+//#include "WiFiMulti.h"
+#include <vector>
+#include <limits.h>
+#include <string.h>
+#include <esp32-hal.h>
+
+typedef struct {
+    char * ssid;
+    char * passphrase;
+} WifiAPlist_t;
+
+class WifiMul
+{
+public:
+    WifiMul();
+    ~WifiMul();
+
+    bool addAP(const char* ssid, const char *passphrase = NULL);
+
+    uint8_t run(uint32_t connectTimeout=5000);
+
+private:
+    std::vector<WifiAPlist_t> APlist;
+} wifiMulti;
+
 //#include "Network.h"
 //#include "Sys_Variables.h"
 //#include "CSS.h"
@@ -41,8 +67,6 @@ WebServer server(80);
 
 class Interface{
   private:
-    bool sleepen = true;
-    bool serveren = false;
     int centTouch = 0;
     int lh = -1;
     int lm = -1;
@@ -56,6 +80,7 @@ class Interface{
     int touchLast = 0;
     uint32_t targetTime;
     uint32_t sleepTime;
+    uint32_t wifiTime;
     void watchFace();
     void battery();
     void services();
@@ -63,9 +88,17 @@ class Interface{
     int touchZone();
     void drawPNG(int16_t x, int16_t y, const char *name);
     void touchTick();
-    void WifiTimeSync();
-    void SDWebServer();
+    void WifiTimeSyncUI();
+    void SDWebServerUI();
+    void WifiInit();
+    void WifiToggle();
+    void WifiToggleUI();
+    void HotspotToggle();
   public:
+    bool wifien = false;
+    bool sleepen = true;
+    bool serveren = false;
+    bool hotspoten = false;
     bool hasSD = false;
     TFT_eSPI tft = TFT_eSPI();  
     TFT_eSprite face = TFT_eSprite(&tft);
@@ -75,6 +108,7 @@ class Interface{
 
 void setup() {
   //Serial.begin(115200);
+  //Serial.setDebugOutput(true);
   //Serial.println("Booting...");
   UI.begin();
 }

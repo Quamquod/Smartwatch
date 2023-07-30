@@ -98,7 +98,7 @@ bool loadFromSdCard(String path) {
   }
 
   if (server.streamFile(dataFile, dataType) != dataFile.size()) {
-    //DBG_OUTPUT_PORT.println("Sent less data than expected!");
+    //Serial.println("Sent less data than expected!");
   }
 
   dataFile.close();
@@ -115,17 +115,17 @@ void handleFileUpload() {
       SD.remove((char *)upload.filename.c_str());
     }
     uploadFile = SD.open(upload.filename.c_str(), FILE_WRITE);
-    //DBG_OUTPUT_PORT.print("Upload: START, filename: "); DBG_OUTPUT_PORT.println(upload.filename);
+    //Serial.print("Upload: START, filename: "); //Serial.println(upload.filename);
   } else if (upload.status == UPLOAD_FILE_WRITE) {
     if (uploadFile) {
       uploadFile.write(upload.buf, upload.currentSize);
     }
-    //DBG_OUTPUT_PORT.print("Upload: WRITE, Bytes: "); DBG_OUTPUT_PORT.println(upload.currentSize);
+    //Serial.print("Upload: WRITE, Bytes: "); //Serial.println(upload.currentSize);
   } else if (upload.status == UPLOAD_FILE_END) {
     if (uploadFile) {
       uploadFile.close();
     }
-    //DBG_OUTPUT_PORT.print("Upload: END, Size: "); DBG_OUTPUT_PORT.println(upload.totalSize);
+    //Serial.print("Upload: END, Size: "); //Serial.println(upload.totalSize);
   }
 }
 
@@ -253,19 +253,19 @@ void handleNotFound() {
     message += " NAME:" + server.argName(i) + "\n VALUE:" + server.arg(i) + "\n";
   }
   server.send(404, "text/plain", message);
-  //DBG_OUTPUT_PORT.print(message);
+  //Serial.print(message);
 }
 
 /*
 void setup(void) {
   delay(5000);
-  DBG_OUTPUT_PORT.begin(115200);
-  DBG_OUTPUT_PORT.setDebugOutput(true);
-  DBG_OUTPUT_PORT.print("\n");
+  //Serial.begin(115200);
+  //Serial.setDebugOutput(true);
+  //Serial.print("\n");
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
-  DBG_OUTPUT_PORT.print("Connecting to ");
-  DBG_OUTPUT_PORT.println(ssid);
+  //Serial.print("Connecting to ");
+  //Serial.println(ssid);
 
   // Wait for connection
   uint8_t i = 0;
@@ -273,14 +273,14 @@ void setup(void) {
     delay(500);
   }
   if (i == 21) {
-    DBG_OUTPUT_PORT.print("Could not connect to");
-    DBG_OUTPUT_PORT.println(ssid);
+    //Serial.print("Could not connect to");
+    //Serial.println(ssid);
     while (1) {
       delay(500);
     }
   }
-  DBG_OUTPUT_PORT.print("Connected! IP address: ");
-  DBG_OUTPUT_PORT.println(WiFi.localIP());
+  //Serial.print("Connected! IP address: ");
+  //Serial.println(WiFi.localIP());
   
   server.on("/list", HTTP_GET, printDirectory);
   server.on("/edit", HTTP_DELETE, handleDelete);
@@ -291,10 +291,10 @@ void setup(void) {
   server.onNotFound(handleNotFound);
 
   server.begin();
-  DBG_OUTPUT_PORT.println("HTTP server started");
+  //Serial.println("HTTP server started");
 
   if (SD.begin(D2)) {
-    DBG_OUTPUT_PORT.println("SD Card initialized.");
+    //Serial.println("SD Card initialized.");
     UI.hasSD = true;
   }
 }
@@ -304,25 +304,3 @@ void loop(void) {
   delay(2);//allow the cpu to switch to other tasks
 }
 */
-void Interface::SDWebServer(){
-  if (serveren == false){
-    drawPNG(40,40,"/data/serv_dis.png");
-    tft.drawArc(120, 120, 115, 110, 0, 360, TFT_YELLOW, TFT_BLACK);
-    if (centTouch == 2){
-      tft.fillCircle(120,120,118,TFT_BLACK);
-      serveren = true;
-      server.begin();
-      centTouch = 0;
-    }
-  }
-  if (serveren == true){
-    drawPNG(40,40,"/data/serv_enb.png");
-    tft.drawArc(120, 120, 115, 110, 0, 360, TFT_BLUE, TFT_BLACK);
-    if (centTouch == 2){
-      tft.fillCircle(120,120,118,TFT_BLACK);
-      serveren = false;
-      server.stop();
-      centTouch = 0;
-    }
-  }
-}
